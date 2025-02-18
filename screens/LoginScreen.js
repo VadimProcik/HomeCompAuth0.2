@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
-import { auth, signInWithEmailAndPassword} from '../firebase'; // Import Firebase Auth and Firestore functions
+import { View, Text, TextInput, Button, StyleSheet, Alert, Image } from 'react-native';
+import { auth, signInWithEmailAndPassword } from '../firebase'; // Import Firebase Auth and Firestore functions
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
-
 
 const LoginScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
@@ -25,7 +24,6 @@ const LoginScreen = ({ navigation }) => {
           const userData = userDoc.data(); // Get the user data from Firestore
           const userRole = userData.role; // Assuming 'role' is a field in your Firestore user document
 
-          // Now you can navigate based on the role
           if (userRole === 'admin') {
             navigation.replace('AdminHome');
           } else if (userRole === 'client') {
@@ -47,7 +45,11 @@ const LoginScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      {/* Temporary Logo */}
+      <Image source={require('../assets/COMPANIAN.png')} style={styles.logo} /> 
+
       <Text style={styles.title}>Login</Text>
+
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -61,7 +63,11 @@ const LoginScreen = ({ navigation }) => {
         value={password}
         onChangeText={setPassword}
       />
-      <Button title="Login" onPress={handleLogin} />
+
+      {/* Custom Login Button */}
+      <View style={styles.loginButtonContainer}>
+        <Button title="Login" onPress={handleLogin} color="#fff" />
+      </View>
     </View>
   );
 };
@@ -71,8 +77,15 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#e0e0e0',
     padding: 20,
+  },
+  logo: {
+    width: 200,
+    height: 200,
+    marginBottom: 30,
+    backgroundColor: 'black',
+    borderRadius: 25,
   },
   title: {
     fontSize: 24,
@@ -81,17 +94,20 @@ const styles = StyleSheet.create({
   },
   input: {
     width: '80%',
-    height: 40,
+    height: 50,
     borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 10,
-    marginBottom: 10,
+    marginBottom: 20,
     backgroundColor: '#fff',
+  },
+  loginButtonContainer: {
+    width: '80%',
+    backgroundColor: '#E200FF', 
+    borderRadius: 5,
+    overflow: 'hidden',
   },
 });
 
 export default LoginScreen;
-
-
-//https://youtu.be/0_mRcoypaKk?si=H7TtesryivM2w2g1
