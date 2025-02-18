@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "431805722250",
+    "project_id": "testingauth-59b25",
+    "storage_bucket": "testingauth-59b25.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:431805722250:android:9e3d5e62f0548204c30773",
+        "android_client_info": {
+          "package_name": "Home.Companian"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBJQMydwR2IYLFv0vC55H75gVG5rokbmKg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
