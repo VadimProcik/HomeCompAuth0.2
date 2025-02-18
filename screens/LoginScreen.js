@@ -1,33 +1,45 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
-import { auth, signInWithEmailAndPassword } from '../firebase'; // Import Firebase Auth functions
+import { auth, signInWithEmailAndPassword} from '../firebase'; // Import Firebase Auth and Firestore functions
+import { getFirestore, doc, getDoc } from 'firebase/firestore';
+
 
 const LoginScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     // Check if username and password are entered
     if (username && password) {
-      // Firebase Authentication login
-      signInWithEmailAndPassword(auth, username, password) 
-        .then((userCredential) => {
-          // Signed in successfully
-          const user = userCredential.user;
+      try {
+        // Firebase Authentication login
+        const userCredential = await signInWithEmailAndPassword(auth, username, password); // Use Firebase Auth to sign in
+        const user = userCredential.user;
 
-          // You can add role-based navigation logic here
-          if (user.email === 'admin@gmail.com') {
+        // Now, retrieve the user data from Firestore to get the role
+        const db = getFirestore();
+        const userDocRef = doc(db, 'users', user.uid); // Access the 'users' collection, using the user uid
+        const userDoc = await getDoc(userDocRef); // Get the document
+
+        if (userDoc.exists()) {
+          const userData = userDoc.data(); // Get the user data from Firestore
+          const userRole = userData.role; // Assuming 'role' is a field in your Firestore user document
+
+          // Now you can navigate based on the role
+          if (userRole === 'admin') {
             navigation.replace('AdminHome');
-          } else if (user.email === 'client@gmail.com') {
+          } else if (userRole === 'client') {
             navigation.replace('ClientHome');
           } else {
             Alert.alert('Login Failed', 'User role not assigned.');
           }
-        })
-        .catch((error) => {
-          const errorMessage = error.message;
-          Alert.alert('Login Failed', errorMessage || 'Invalid username or password');
-        });
+        } else {
+          Alert.alert('Login Failed', 'User not found in Firestore.');
+        }
+      } catch (error) {
+        const errorMessage = error.message;
+        Alert.alert('Login Failed', errorMessage || 'Invalid username or password');
+      }
     } else {
       Alert.alert('Input Error', 'Please enter both username and password');
     }
