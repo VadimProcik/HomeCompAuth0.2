@@ -1,76 +1,56 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, Image, Keyboard, TouchableWithoutFeedback, Platform, KeyboardAvoidingView } from 'react-native';
-import { auth, signInWithEmailAndPassword } from '../firebase'; // Import Firebase Auth and Firestore functions
-import { getFirestore, doc, getDoc } from 'firebase/firestore';
+import React, { useState } from "react";
+import {View, Text, TextInput, Button, StyleSheet, Alert, Image, Keyboard, TouchableWithoutFeedback, Platform, KeyboardAvoidingView,} from "react-native";
+import { auth, signInWithEmailAndPassword } from "../firebase"; // Firebase auth
+import { getFirestore, doc, getDoc } from "firebase/firestore";
 
 const LoginScreen = ({ navigation }) => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
-    // Check if username and password are entered
-    if (username && password) {
-      try {
-        // Firebase Authentication login
-        const userCredential = await signInWithEmailAndPassword(auth, username, password); // Use Firebase Auth to sign in
-        const user = userCredential.user;
+    if (!username || !password) {
+      Alert.alert("Input Error", "Please enter both email and password");
+      return;
+    }
 
-        // Now, retrieve the user data from Firestore to get the role
-        const db = getFirestore();
-        const userDocRef = doc(db, 'users', user.uid); // Access the 'users' collection, using the user uid
-        const userDoc = await getDoc(userDocRef); // Get the document
+    try {
+      // Firebase Authentication login
+      const userCredential = await signInWithEmailAndPassword(auth, username, password);
+      const user = userCredential.user;
 
-        if (userDoc.exists()) {
-          const userData = userDoc.data(); // Get the user data from Firestore
-          const userRole = userData.role; // Assuming 'role' is a field in your Firestore user document
+      // Firestore reference
+      const db = getFirestore();
+      const userDocRef = doc(db, "users", user.uid);
+      const userDoc = await getDoc(userDocRef);
 
-          if (userRole === 'admin') {
-            navigation.replace('AdminHome');
-          } else if (userRole === 'client') {
-            navigation.replace('ClientHome');
-          } else {
-            Alert.alert('Login Failed', 'User role not assigned.');
-          }
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        const userRole = userData.role;
+        const ProjectId = userData.ProjectId || null; // Ensure projectId is handled
+
+        if (userRole === "admin") {
+          navigation.replace("AdminHome");
+        } else if (userRole === "client") {
+          navigation.replace("ClientHome", { ProjectId }); // Pass projectId
         } else {
-          Alert.alert('Login Failed', 'User not found in Firestore.');
+          Alert.alert("Login Failed", "User role not assigned.");
         }
-      } catch (error) {
-        const errorMessage = error.message;
-        Alert.alert('Login Failed', errorMessage || 'Invalid username or password');
+      } else {
+        Alert.alert("Login Failed", "User not found in Firestore.");
       }
-    } else {
-      Alert.alert('Input Error', 'Please enter both username and password');
+    } catch (error) {
+      Alert.alert("Login Failed", error.message || "Invalid username or password");
     }
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'} // Platform specific behavior
-      style={styles.container}
-    >
-      {/* Wrap the entire content in a single View */}
+    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <View style={styles.innerContainer}>
-          {/* Temporary Logo */}
-          <Image source={require('../assets/COMPANIAN.png')} style={styles.logo} />
-
+          <Image source={require("../assets/COMPANIAN.png")} style={styles.logo} />
           <Text style={styles.title}>Login</Text>
-
-          <TextInput
-            style={styles.input}
-            placeholder="Email"
-            value={username}
-            onChangeText={setUsername}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-          />
-
-          {/* Custom Login Button */}
+          <TextInput style={styles.input} placeholder="Email" value={username} onChangeText={setUsername} />
+          <TextInput style={styles.input} placeholder="Password" secureTextEntry value={password} onChangeText={setPassword} />
           <View style={styles.loginButtonContainer}>
             <Button title="Login" onPress={handleLogin} color="#fff" />
           </View>
@@ -83,44 +63,44 @@ const LoginScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#e0e0e0',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#e0e0e0",
     padding: 20,
   },
   innerContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '100%',
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
   },
   logo: {
     width: 200,
     height: 200,
     marginBottom: 30,
-    backgroundColor: 'black',
+    backgroundColor: "black",
     borderRadius: 25,
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
   },
   input: {
-    width: '80%',
+    width: "80%",
     height: 50,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 10,
     marginBottom: 20,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   loginButtonContainer: {
-    width: '80%',
-    backgroundColor: '#E200FF',
+    width: "80%",
+    backgroundColor: "#E200FF",
     borderRadius: 5,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
 });
 
