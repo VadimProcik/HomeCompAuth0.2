@@ -74,13 +74,15 @@ const ClientHomePage = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8f9fa",
+    backgroundColor: "e0e0e0",
     padding: 10,
   },
   welcomeContainer: {
     height: 100,
     backgroundColor: "#fff",
     borderRadius: 10,
+    borderColor: "#E200FF", 
+    borderWidth: 2,
     marginBottom: 20,
     justifyContent: "center",
     alignItems: "center",
@@ -103,6 +105,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 10,
     backgroundColor: "#fff",
+    borderColor: "#1CB4FF", 
+    borderWidth: 2,
     borderRadius: 10,
     elevation: 2,
   },
