@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, Image } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert, Image, Keyboard, TouchableWithoutFeedback, Platform, KeyboardAvoidingView } from 'react-native';
 import { auth, signInWithEmailAndPassword } from '../firebase'; // Import Firebase Auth and Firestore functions
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 
@@ -44,31 +44,39 @@ const LoginScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      {/* Temporary Logo */}
-      <Image source={require('../assets/COMPANIAN.png')} style={styles.logo} /> 
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'} // Platform specific behavior
+      style={styles.container}
+    >
+      {/* Wrap the entire content in a single View */}
+      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+        <View style={styles.innerContainer}>
+          {/* Temporary Logo */}
+          <Image source={require('../assets/COMPANIAN.png')} style={styles.logo} />
 
-      <Text style={styles.title}>Login</Text>
+          <Text style={styles.title}>Login</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={username}
-        onChangeText={setUsername}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            value={username}
+            onChangeText={setUsername}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+          />
 
-      {/* Custom Login Button */}
-      <View style={styles.loginButtonContainer}>
-        <Button title="Login" onPress={handleLogin} color="#fff" />
-      </View>
-    </View>
+          {/* Custom Login Button */}
+          <View style={styles.loginButtonContainer}>
+            <Button title="Login" onPress={handleLogin} color="#fff" />
+          </View>
+        </View>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -79,6 +87,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#e0e0e0',
     padding: 20,
+  },
+  innerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
   },
   logo: {
     width: 200,
@@ -104,7 +118,7 @@ const styles = StyleSheet.create({
   },
   loginButtonContainer: {
     width: '80%',
-    backgroundColor: '#E200FF', 
+    backgroundColor: '#E200FF',
     borderRadius: 5,
     overflow: 'hidden',
   },
