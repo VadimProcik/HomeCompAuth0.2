@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -7,31 +7,36 @@ import {
   Button,
   FlatList,
   Image,
-} from 'react-native';
+} from "react-native";
 
 const ProjectPage = ({ route }) => {
-  const job = route.params?.job; // Prevents crashing if job is undefined
+  const project = route.params?.project; // Ensure project exists before using it
 
-  if (!job) {
+  if (!project) {
     return (
       <View style={styles.container}>
-        <Text style={styles.errorText}>Error: No project data available.</Text>
+        <Text style={styles.header}>No Project Selected</Text>
       </View>
     );
   }
 
   const [posts, setPosts] = useState([]);
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [imageUri, setImageUri] = useState('');
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [imageUri, setImageUri] = useState("");
 
   const addPost = () => {
     if (title && description && imageUri) {
-      const newPost = { id: Date.now().toString(), title, description, imageUri };
+      const newPost = {
+        id: Date.now().toString(),
+        title,
+        description,
+        imageUri,
+      };
       setPosts([...posts, newPost]);
-      setTitle('');
-      setDescription('');
-      setImageUri('');
+      setTitle("");
+      setDescription("");
+      setImageUri("");
     }
   };
 
@@ -45,8 +50,12 @@ const ProjectPage = ({ route }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Project: {job.name}, {job.location}</Text>
+      {/* Display Project Name */}
+      <Text style={styles.header}>
+        Project: {project.ProjectId || "Unnamed Project"}
+      </Text>
 
+      {/* Posts List */}
       <FlatList
         data={posts}
         renderItem={renderPost}
@@ -54,6 +63,7 @@ const ProjectPage = ({ route }) => {
         style={styles.postList}
       />
 
+      {/* Input Fields for Adding Posts */}
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
@@ -83,37 +93,31 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: "#f8f9fa",
   },
   header: {
     fontSize: 22,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
-  },
-  errorText: {
-    fontSize: 18,
-    color: 'red',
-    textAlign: 'center',
-    marginTop: 20,
   },
   postList: {
     marginBottom: 20,
   },
   postContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 10,
     padding: 10,
     marginBottom: 15,
     elevation: 3,
   },
   image: {
-    width: '100%',
+    width: "100%",
     height: 150,
     borderRadius: 10,
   },
   postTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginTop: 10,
   },
   postDescription: {
@@ -122,13 +126,13 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     padding: 15,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 10,
     elevation: 3,
   },
   input: {
     height: 40,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 10,
