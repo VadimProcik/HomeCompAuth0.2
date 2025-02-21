@@ -10,7 +10,16 @@ import {
 } from 'react-native';
 
 const ProjectPage = ({ route }) => {
-  const { job } = route.params;
+  const job = route.params?.job; // Prevents crashing if job is undefined
+
+  if (!job) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.errorText}>Error: No project data available.</Text>
+      </View>
+    );
+  }
+
   const [posts, setPosts] = useState([]);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -80,6 +89,12 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 20,
+  },
+  errorText: {
+    fontSize: 18,
+    color: 'red',
+    textAlign: 'center',
+    marginTop: 20,
   },
   postList: {
     marginBottom: 20,

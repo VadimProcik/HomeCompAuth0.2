@@ -1,80 +1,52 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  TextInput,
-  Button,
-} from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+} from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { collection, onSnapshot } from "firebase/firestore";
+import { db } from "../firebase";
 
 const AdminHomePage = () => {
-  const [jobs, setJobs] = useState([
-    { id: '1', name: 'Tara Gorby', location: 'Monkstown' },
-    { id: '2', name: 'Paul Keenan', location: 'Kilmacud' },
-    { id: '3', name: 'Brendan Jennings', location: 'Summerhill' },
-  ]);
-
-  const [newJobName, setNewJobName] = useState('');
-  const [newJobLocation, setNewJobLocation] = useState('');
-
+  const [projects, setProjects] = useState([]);
   const navigation = useNavigation();
 
-  const addNewJob = () => {
-    if (newJobName && newJobLocation) {
-      const newJob = {
-        id: (jobs.length + 1).toString(),
-        name: newJobName,
-        location: newJobLocation,
-      };
-      setJobs([...jobs, newJob]);
-      setNewJobName('');
-      setNewJobLocation('');
-    }
-  };
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, "users"), (snapshot) => {
+      const projectList = snapshot.docs.map((doc) => ({
+        id: doc.id, 
+        ProjectId: doc.data().ProjectId, 
+      }));
 
-  const handleJobPress = (job) => {
-    navigation.navigate('ProjectPages', { job });
-  };
+      setProjects(projectList); // Update state with new projects
+    });
 
-  const renderJobItem = ({ item }) => (
-    <TouchableOpacity style={styles.jobItem} onPress={() => handleJobPress(item)}>
-      <Text style={styles.jobText}>{item.name}, {item.location}</Text>
-    </TouchableOpacity>
-  );
+    return () => unsubscribe(); // Cleanup listener when component unmounts
+  }, []);
+
+  const handleProjectPress = (project) => {
+    navigation.navigate("ProjectPages", { project }); // Pass correct object
+  };
 
   return (
     <View style={styles.container}>
-      {/* Title */}
-      <Text style={styles.title}>Jobs List</Text>
+      <Text style={styles.title}>Projects</Text>
 
-      {/* Job List */}
       <FlatList
-        data={jobs}
-        renderItem={renderJobItem}
+        data={projects}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            style={styles.projectButton}
+            onPress={() => handleProjectPress(item)}
+          >
+            <Text style={styles.projectText}>{item.ProjectId}</Text>
+          </TouchableOpacity>
+        )}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.jobList}
       />
-
-      {/* Add New Project Section */}
-      <View style={styles.addProjectContainer}>
-        <Text style={styles.addProjectTitle}>Add New Project</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Client Name"
-          value={newJobName}
-          onChangeText={setNewJobName}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Location"
-          value={newJobLocation}
-          onChangeText={setNewJobLocation}
-        />
-        <Button title="Add Project" onPress={addNewJob} />
-      </View>
     </View>
   );
 };
@@ -82,53 +54,26 @@ const AdminHomePage = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: "#f8f9fa",
     padding: 10,
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
     marginBottom: 20,
-    textAlign: 'center',
+    textAlign: "center",
   },
-  jobList: {
-    marginBottom: 20,
-  },
-  jobItem: {
-    padding: 20,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    marginBottom: 15,
-    elevation: 2,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  jobText: {
-    fontSize: 18,
-    color: '#333',
-    textAlign: 'center',
-  },
-  addProjectContainer: {
+  projectButton: {
     padding: 15,
-    backgroundColor: '#fff',
+    backgroundColor: "#007bff",
     borderRadius: 10,
-    elevation: 3,
+    marginBottom: 10,
+    alignItems: "center",
   },
-  addProjectTitle: {
+  projectText: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 10,
-  },
-  input: {
-    height: 40,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 10,
-    backgroundColor: '#fefefe',
+    color: "#fff",
   },
 });
 
